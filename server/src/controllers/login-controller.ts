@@ -1,5 +1,5 @@
-import {Request, Response} from 'express';
 import {UserAuth, validateUser} from '../models';
+import {Request, Response} from 'express';
 
 export default class LoginController {
     login(request: Request, response: Response) {
