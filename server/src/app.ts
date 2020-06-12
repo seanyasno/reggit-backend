@@ -1,4 +1,5 @@
-import express, {Request, Response} from 'express';
+import {authentication} from './routes';
+import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -14,9 +15,7 @@ app.use(cors({
 app.use(express.json());
 
 // routes
-app.get('/ping', (req: Request, res: Response) => {
-    res.send('pong');
-});
+app.use('/api/auth', authentication)
 
 // middlewares
 
