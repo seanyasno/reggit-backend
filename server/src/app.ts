@@ -17,8 +17,6 @@ app.use(express.json());
 // routes
 app.use('/api/auth', authentication)
 
-// middlewares
-
 // listen
 const PORT = 1337;
 app.listen(PORT, () => {

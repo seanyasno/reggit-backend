@@ -1,4 +1,4 @@
 export default interface UserAuth {
-    identifier: string;
+    username: string;
     password: string;
 }

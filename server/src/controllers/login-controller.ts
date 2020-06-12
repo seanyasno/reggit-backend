@@ -1,13 +1,24 @@
-import {Request, RequestHandler, Response} from "express";
-import {UserAuth} from "../models";
+import {Request, Response} from 'express';
+import {UserAuth, validateUser} from '../models';
 
 export default class LoginController {
     login(request: Request, response: Response) {
-        const {identifier, password}: UserAuth = request.body;
+        const {username, password}: UserAuth = request.body;
 
-        console.log(identifier, password);
+        const userValidator = validateUser({
+            username,
+            password
+        });
 
-        if (identifier === 'admin' && password === 'admin') {
+        if (userValidator.error) {
+            return response.status(400).json({
+                errors: {
+                    form: userValidator.error.details[0].message
+                }
+            });
+        }
+
+        if (username === 'admin' && password === 'admin') {
             return response.json({message: 'logged in :D'});
         }
 
