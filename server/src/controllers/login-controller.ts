@@ -14,21 +14,21 @@ export default class LoginController {
         });
 
         if (userValidator.error) {
-            return response.status(400).json({
+            return response.status(401).json({
                 errors: {
                     form: userValidator.error.details[0].message
                 }
             });
         }
 
-        UserModel.findOne({username}, (error: any, res: IUserDocument | null) => {
+        UserModel.findOne({username}, async (error: any, res: IUserDocument | null) => {
             if (error || !res) {
-                return response.status(400).json({
+                return response.status(401).json({
                     errors: {form: 'Invalid Credentials'}
                 });
             }
 
-            const validPass = bcrypt.compare(password, res.password);
+            const validPass = await bcrypt.compare(password, res.password);
             if (validPass) {
                 const token = jwt.sign({
                     id: res._id,
