@@ -1,9 +1,9 @@
 import validateUser from './validators/user/validate-user';
 import UserModel from './mongo/user-model';
-import UserAuth from './user-auth';
+import IUserAuth from './user-auth';
 
 export {
     validateUser,
     UserModel,
-    UserAuth
+    IUserAuth
 }

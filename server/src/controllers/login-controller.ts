@@ -1,13 +1,16 @@
-import {UserAuth, validateUser} from '../models';
+import {IUserAuth, UserModel, validateUser} from '../models';
+import IUserDocument from '../models/mongo/user-document';
 import {Request, Response} from 'express';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 export default class LoginController {
     login(request: Request, response: Response) {
-        const {username, password}: UserAuth = request.body;
+        const {username, password}: IUserAuth = request.body;
 
         const userValidator = validateUser({
             username,
-            password
+            password,
         });
 
         if (userValidator.error) {
@@ -18,10 +21,25 @@ export default class LoginController {
             });
         }
 
-        if (username === 'admin' && password === 'admin') {
-            return response.json({message: 'logged in :D'});
-        }
+        UserModel.findOne({username}, (error: any, res: IUserDocument | null) => {
+            if (error || !res) {
+                return response.status(400).json({
+                    errors: {form: 'Invalid Credentials'}
+                });
+            }
 
-        return response.json({message: 'wrong username or password'});
+            const validPass = bcrypt.compare(password, res.password);
+            if (validPass) {
+                const token = jwt.sign({
+                    id: res._id,
+                    username: res.username
+                }, process.env.JWT_SECRET || '');
+                return response.json({token});
+            }
+
+            return response.status(401).json({
+                errors: {form: 'Invalid Credentials'}
+            });
+        });
     }
 }
