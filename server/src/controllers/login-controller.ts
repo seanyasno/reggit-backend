@@ -1,5 +1,5 @@
 import {IUserAuth, UserModel, validateUser} from '../models';
-import IUserDocument from '../models/mongo/user-document';
+import IUserDocument from '../models/mongo/user/user-document';
 import {Request, Response} from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';

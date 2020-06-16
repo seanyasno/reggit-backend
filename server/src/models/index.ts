@@ -1,6 +1,6 @@
 import validateUser from './validators/user/validate-user';
-import IUserDocument from './mongo/user-document';
-import UserModel from './mongo/user-model';
+import IUserDocument from './mongo/user/user-document';
+import UserModel from './mongo/user/user-model';
 import IUserAuth from './user-auth';
 
 export {
