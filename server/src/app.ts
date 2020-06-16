@@ -1,4 +1,4 @@
-import {authentication} from './routes';
+import {authentication, posting} from './routes';
 import mongoose from 'mongoose';
 import express from 'express';
 import helmet from 'helmet';
@@ -19,6 +19,7 @@ app.use(express.json());
 
 // routes
 app.use('/api/auth', authentication)
+app.use('/api/post', posting);
 
 // db connection
 mongoose.connect(process.env.MONGO_DB_CONNECTION_URL || '', {
