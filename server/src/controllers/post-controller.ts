@@ -1,8 +1,5 @@
 import {Request, Response} from 'express';
-import {IPost, PostModel, UserModel} from '../models';
-import IUserDocument from '../models/mongo/user/user-document';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import {IPost, PostModel} from '../models';
 import IPostDocument from '../models/mongo/post/post-document';
 
 export default class PostController {
