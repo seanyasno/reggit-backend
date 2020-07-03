@@ -1,4 +1,5 @@
 import {authentication, posting} from './routes';
+import {database} from './conf/config';
 import mongoose from 'mongoose';
 import express from 'express';
 import helmet from 'helmet';
@@ -25,7 +26,14 @@ app.use('/api/post', posting);
 mongoose.connect(process.env.MONGO_DB_CONNECTION_URL || '', {
     useNewUrlParser: true,
     useUnifiedTopology: true
-}, () => console.log('Connected to DB.'));
+}, () => console.log('Connected to mongodb.'));
+
+database.authenticate().then(() => {
+    console.log('Connected to postgres database.');
+}).catch(error => {
+    console.log("Couldn't connect to postgres database.");
+    console.error(error);
+});
 
 // listen
 app.listen(process.env.PORT || 8080, () => {
