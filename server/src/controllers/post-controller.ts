@@ -1,5 +1,5 @@
-import {Request, Response} from 'express';
 import {IPost, PostModel} from '../models';
+import {Request, Response} from 'express';
 import {v4} from 'uuid';
 
 export default class PostController {
