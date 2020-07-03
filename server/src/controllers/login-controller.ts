@@ -1,5 +1,4 @@
 import {IUserAuth, UserModel, validateUser} from '../models';
-import IUserDocument from '../models/mongo/user/user-document';
 import {Request, Response} from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
@@ -21,22 +20,23 @@ export default class LoginController {
             });
         }
 
-        UserModel.findOne({username}, async (error: any, res: IUserDocument | null) => {
-            if (error || !res) {
-                return response.status(401).json({
-                    errors: {form: 'Invalid Credentials'}
-                });
-            }
+        UserModel.findOne({
+            where: {username}
+        }).then(async (userData) => {
+            const user: IUserAuth = userData?.toJSON() as IUserAuth;
+            const validPass = await bcrypt.compare(password, user.password);
 
-            const validPass = await bcrypt.compare(password, res.password);
             if (validPass) {
                 const token = jwt.sign({
-                    id: res._id,
-                    username: res.username
+                    username: user.username
                 }, process.env.JWT_SECRET || '');
                 return response.json({token});
             }
 
+            return response.status(401).json({
+                errors: {form: 'Invalid Credentials'}
+            });
+        }).catch(() => {
             return response.status(401).json({
                 errors: {form: 'Invalid Credentials'}
             });

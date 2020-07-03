@@ -1,5 +1,5 @@
-import {authentication} from './routes';
-import mongoose from 'mongoose';
+import {authentication, posting} from './routes';
+import {database} from './conf/config';
 import express from 'express';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
@@ -19,12 +19,15 @@ app.use(express.json());
 
 // routes
 app.use('/api/auth', authentication)
+app.use('/api/post', posting);
 
 // db connection
-mongoose.connect(process.env.MONGO_DB_CONNECTION_URL || '', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}, () => console.log('Connected to DB.'));
+database.authenticate().then(() => {
+    console.log('Connected to postgres database.');
+}).catch(error => {
+    console.log("Couldn't connect to postgres database.");
+    console.error(error);
+});
 
 // listen
 app.listen(process.env.PORT || 8080, () => {
