@@ -1,5 +1,5 @@
 import {database} from '../../conf/config';
-import {STRING, INTEGER} from 'sequelize';
+import {STRING} from 'sequelize';
 
 const UserModel = database.define('user', {
     username: {
