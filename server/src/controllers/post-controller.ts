@@ -1,19 +1,18 @@
 import {Request, Response} from 'express';
 import {IPost, PostModel} from '../models';
-import IPostDocument from '../models/mongo/post/post-document';
+import {v4} from 'uuid';
 
 export default class PostController {
     async createPost(request: Request, response: Response) {
-        const {author, content, votes = 0}: IPost = request.body;
-
-        const post = new PostModel({
-            author,
-            content,
-            votes
-        });
+        const {id = v4(), author, content, votes = 0}: IPost = request.body;
 
         try {
-            const savedPost = await post.save();
+            const savedPost = await PostModel.create({
+                id,
+                author,
+                content,
+                votes
+            });
             return await response.json(savedPost);
         } catch (error) {
             return response.status(400).json({message: error});
@@ -22,14 +21,15 @@ export default class PostController {
 
     getPostById(request: Request, response: Response) {
         const {id} = request.params;
-        PostModel.findOne({_id: id}, async (error: any, res: IPostDocument | null) => {
-            if (error || !res) {
-                return response.status(401).json({
-                    errors: {form: 'Invalid post id'}
-                });
-            }
-
-            return response.json(res);
-        });
+        PostModel.findOne({
+            where: {id}
+        }).then(async (postData) => {
+            const post: IPost = await postData?.toJSON() as IPost;
+            return response.json(post);
+        }).catch(() => {
+            return response.status(404).json({
+                errors: {form: 'Invalid post id'}
+            });
+        })
     }
 }
