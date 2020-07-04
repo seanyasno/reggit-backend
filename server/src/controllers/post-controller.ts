@@ -19,18 +19,17 @@ export default class PostController {
         }
     }
 
-    getPostById(request: Request, response: Response) {
+    async getPostById(request: Request, response: Response) {
         const {id} = request.params;
-        PostModel.findOne({
-            where: {id}
-        }).then(async (postData) => {
+        try {
+            const postData = await PostModel.findOne({where: {id}});
             const post: IPost = await postData?.toJSON() as IPost;
             return response.json(post);
-        }).catch(() => {
+        } catch (error) {
             return response.status(404).json({
-                errors: {form: 'Invalid post id'}
+                error: {form: 'Invalid post id'}
             });
-        })
+        }
     }
 
     async votePost(request: Request, response: Response) {
