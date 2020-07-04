@@ -32,4 +32,19 @@ export default class PostController {
             });
         })
     }
+
+    async votePost(request: Request, response: Response) {
+        const {id, voteState} = request.params;
+        const voteToAdd = voteState === 'true' ? 1 : -1;
+        try {
+            const postData = await PostModel.increment({votes: voteToAdd}, {where: {id}});
+            // @ts-ignore
+            const post = postData[0][0][0];
+            return response.json({...post});
+        } catch (error) {
+            return response.status(400).json({
+                errors: {form: error}
+            });
+        }
+    }
 }
