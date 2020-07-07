@@ -1,4 +1,4 @@
-import {IPost, PostModel} from '../models';
+import {IPost, PostModel, ProfileModel, UserModel} from '../models';
 import {Request, Response} from 'express';
 import {v4} from 'uuid';
 
@@ -9,7 +9,7 @@ export default class PostController {
         try {
             const savedPost = await PostModel.create({
                 id,
-                author,
+                author_id: author,
                 content,
                 votes
             });
@@ -28,6 +28,25 @@ export default class PostController {
         } catch (error) {
             return response.status(404).json({
                 error: {form: 'Invalid post id'}
+            });
+        }
+    }
+
+    async getAllPosts(request: Request, response: Response) {
+        try {
+            const posts = await PostModel.findAll({
+                include: [
+                    {
+                        model: UserModel,
+                        attributes: ['username'],
+                        include: [ProfileModel]
+                    }
+                ],
+            });
+            return response.json(posts);
+        } catch (error) {
+            return response.status(400).json({
+                error: {form: error}
             });
         }
     }

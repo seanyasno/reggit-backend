@@ -1,7 +1,7 @@
 import UserModel from '../models/postgres/user-model';
 import IUserAuth from '../models/user-auth';
 import {Request, Response} from 'express';
-import {validateUser} from '../models';
+import {ProfileModel, validateUser} from '../models';
 import bcrypt from 'bcrypt';
 
 export default class RegisterController {
@@ -37,7 +37,9 @@ export default class RegisterController {
 
     async getUsers(request: Request, response: Response) {
         try {
-            const users = await UserModel.findAll();
+            const users = await UserModel.findAll({
+                attributes: ['username']
+            });
             return response.json({users});
         } catch (error) {
             return response.json({errors: error});
