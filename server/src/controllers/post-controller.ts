@@ -4,12 +4,12 @@ import {v4} from 'uuid';
 
 export default class PostController {
     async createPost(request: Request, response: Response) {
-        const {id = v4(), author, content, votes = 0}: IPost = request.body;
+        const {id = v4(), userId, content, votes = 0}: IPost = request.body;
 
         try {
             const savedPost = await PostModel.create({
                 id,
-                author_id: author,
+                userId,
                 content,
                 votes
             });
