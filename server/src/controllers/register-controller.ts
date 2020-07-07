@@ -1,7 +1,6 @@
 import UserModel from '../models/postgres/user-model';
-import IUserAuth from '../models/user-auth';
 import {Request, Response} from 'express';
-import {validateUser} from '../models';
+import {validateUser,  IUserAuth} from '../models';
 import bcrypt from 'bcrypt';
 import {v4} from 'uuid';
 

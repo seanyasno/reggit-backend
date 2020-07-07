@@ -3,6 +3,8 @@ import ProfileModel from './postgres/profile-model';
 import UserModel from './postgres/user-model';
 import PostModel from './postgres/post-model';
 import IUserAuth from './user-auth';
+import IProfile from './profile';
+import IUser from './user';
 import IPost from './post';
 
 UserModel.hasOne(ProfileModel);
@@ -17,5 +19,7 @@ export {
     UserModel,
     PostModel,
     IUserAuth,
+    IProfile,
+    IUser,
     IPost
 }

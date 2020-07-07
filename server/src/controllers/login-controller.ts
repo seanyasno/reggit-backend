@@ -1,4 +1,4 @@
-import {IUserAuth, UserModel, validateUser} from '../models';
+import {IUser, ProfileModel, UserModel, validateUser, IUserAuth} from '../models';
 import {Request, Response} from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
@@ -9,7 +9,7 @@ export default class LoginController {
 
         const userValidator = validateUser({
             username,
-            password,
+            password
         });
 
         if (userValidator.error) {
@@ -21,24 +21,31 @@ export default class LoginController {
         }
 
         UserModel.findOne({
-            where: {username}
+            where: {username},
+            include: [
+                {
+                    model: ProfileModel,
+                    attributes: ['firstName', 'lastName']
+                }
+            ]
         }).then(async (userData) => {
-            const user: IUserAuth = userData?.toJSON() as IUserAuth;
+            const user: IUser = userData?.toJSON() as IUser;
             const validPass = await bcrypt.compare(password, user.password);
 
+            delete user.password;
+            console.log(user);
+
             if (validPass) {
-                const token = jwt.sign({
-                    username: user.username
-                }, process.env.JWT_SECRET || '');
+                const token = jwt.sign({...user}, process.env.JWT_SECRET || '');
                 return response.json({token});
             }
 
             return response.status(401).json({
                 errors: {form: 'Invalid Credentials'}
             });
-        }).catch(() => {
+        }).catch(error => {
             return response.status(401).json({
-                errors: {form: 'Invalid Credentials'}
+                errors: {form: error}
             });
         });
     }
