@@ -39,7 +39,11 @@ export default class PostController {
                     {
                         model: UserModel,
                         attributes: ['username'],
-                        include: [ProfileModel]
+                        include: [
+                            {
+                                model: ProfileModel,
+                            }
+                        ]
                     }
                 ],
             });

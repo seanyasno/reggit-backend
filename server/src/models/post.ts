@@ -1,6 +1,6 @@
 export default interface IPost {
     id: string;
-    userId: number;
+    userId: string;
     content: string;
     votes: number;
 }

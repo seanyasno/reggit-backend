@@ -1,8 +1,9 @@
 import UserModel from '../models/postgres/user-model';
 import IUserAuth from '../models/user-auth';
 import {Request, Response} from 'express';
-import {ProfileModel, validateUser} from '../models';
+import {validateUser} from '../models';
 import bcrypt from 'bcrypt';
+import {v4} from 'uuid';
 
 export default class RegisterController {
     async registerUser(request: Request, response: Response) {
@@ -26,23 +27,13 @@ export default class RegisterController {
 
         try {
             const savedUser = await UserModel.create({
+                id: v4(),
                 username,
                 password: hashedPassword
             });
             return await response.json(savedUser);
         } catch (error) {
             return response.status(400).json({message: error});
-        }
-    }
-
-    async getUsers(request: Request, response: Response) {
-        try {
-            const users = await UserModel.findAll({
-                attributes: ['username']
-            });
-            return response.json({users});
-        } catch (error) {
-            return response.json({errors: error});
         }
     }
 }
