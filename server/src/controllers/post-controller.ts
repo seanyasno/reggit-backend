@@ -89,4 +89,19 @@ export default class PostController {
             });
         }
     }
+
+    async deletePost(request: Request, response: Response) {
+        const {id} = request.params;
+
+        try {
+            const removedPost = await PostModel.destroy({
+                where: {id}
+            });
+            response.json(removedPost);
+        } catch (error) {
+            response.status(400).json({
+                errors: {form: error}
+            });
+        }
+    }
 }
