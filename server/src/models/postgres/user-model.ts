@@ -9,7 +9,8 @@ const UserModel = database.define('user', {
         type: STRING
     }
 }, {
-    timestamps: false
+    timestamps: false,
+    underscored: true
 });
 
 export default UserModel;
