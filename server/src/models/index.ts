@@ -2,6 +2,7 @@ import validateUser from './validators/user/validate-user';
 import ProfileModel from './postgres/profile-model';
 import UserModel from './postgres/user-model';
 import PostModel from './postgres/post-model';
+import LikeModel from './postgres/like-model';
 import IUserAuth from './user-auth';
 import IProfile from './profile';
 import IUser from './user';
@@ -18,6 +19,7 @@ export {
     ProfileModel,
     UserModel,
     PostModel,
+    LikeModel,
     IUserAuth,
     IProfile,
     IUser,
