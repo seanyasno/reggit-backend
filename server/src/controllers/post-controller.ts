@@ -84,7 +84,7 @@ export default class PostController {
     async votePost(request: Request, response: Response) {
         const {id, voteState} = request.params;
         const {user_id=''} = request.headers;
-        let voteToAdd = voteState === 'true' ? 1 : -1;
+        const voteToAdd = voteState === 'true' ? 1 : -1;
 
         try {
             const voteData: any = await LikeModel.findOrCreate({
