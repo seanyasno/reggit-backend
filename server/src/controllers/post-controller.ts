@@ -1,4 +1,4 @@
-import {IPost, PostModel, ProfileModel, UserModel} from '../models';
+import {IPost, LikeModel, PostModel, ProfileModel, UserModel} from '../models';
 import {Request, Response} from 'express';
 import {v4} from 'uuid';
 
@@ -77,12 +77,24 @@ export default class PostController {
 
     async votePost(request: Request, response: Response) {
         const {id, voteState} = request.params;
+        const {user_id} = request.headers;
         const voteToAdd = voteState === 'true' ? 1 : -1;
+
         try {
-            const postData = await PostModel.increment({votes: voteToAdd}, {where: {id}});
-            // @ts-ignore
-            const post = postData[0][0][0];
-            return response.json({...post});
+            const voteData: any = await LikeModel.findOrCreate({
+                where: {postId: id, userId: user_id}
+            });
+            const vote: any = voteData[0]?.toJSON();
+            if (Math.abs(vote.state + voteToAdd) > 1) {
+                const postData = await PostModel.findOne({where: {id}});
+                response.json(postData);
+            } else {
+                await LikeModel.update({state: voteToAdd}, {where: {postId: id, userId: user_id}});
+                const postData = await PostModel.increment({votes: voteToAdd}, {where: {id}});
+                // @ts-ignore
+                const post = postData[0][0][0];
+                return response.json({...post});
+            }
         } catch (error) {
             return response.status(400).json({
                 errors: {form: error}
@@ -98,6 +110,22 @@ export default class PostController {
                 where: {id}
             });
             response.json(removedPost);
+        } catch (error) {
+            response.status(400).json({
+                errors: {form: error}
+            });
+        }
+    }
+
+    async getLikeState(request: Request, response: Response) {
+        const {postId} = request.params;
+        const {user_id} = request.headers;
+
+        try {
+            const likeModel = await LikeModel.findOne({
+                where: {postId, userId: user_id}
+            });
+            response.json(likeModel);
         } catch (error) {
             response.status(400).json({
                 errors: {form: error}
