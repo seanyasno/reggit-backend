@@ -1,5 +1,6 @@
 import validateUser from './validators/user/validate-user';
 import ProfileModel from './postgres/profile-model';
+import CommentModel from './postgres/comment-model';
 import UserModel from './postgres/user-model';
 import PostModel from './postgres/post-model';
 import LikeModel from './postgres/like-model';
@@ -17,6 +18,7 @@ PostModel.belongsTo(UserModel);
 export {
     validateUser,
     ProfileModel,
+    CommentModel,
     UserModel,
     PostModel,
     LikeModel,
