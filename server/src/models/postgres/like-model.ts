@@ -1,5 +1,5 @@
-import {INTEGER, UUID} from 'sequelize';
 import {database} from '../../conf/config';
+import {INTEGER, UUID} from 'sequelize';
 
 const LikeModel = database.define('like', {
     postId: {
