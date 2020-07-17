@@ -116,6 +116,9 @@ export default class PostController {
         const {id} = request.params;
 
         try {
+            await LikeModel.destroy({
+                where: {post_id: id}
+            });
             const removedPost = await PostModel.destroy({
                 where: {id}
             });
