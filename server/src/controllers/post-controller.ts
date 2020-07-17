@@ -78,7 +78,7 @@ export default class PostController {
     async votePost(request: Request, response: Response) {
         const {id, voteState} = request.params;
         const {user_id} = request.headers;
-        const voteToAdd = voteState === 'true' ? 1 : -1;
+        let voteToAdd = voteState === 'true' ? 1 : -1;
 
         try {
             const voteData: any = await LikeModel.findOrCreate({
@@ -86,10 +86,17 @@ export default class PostController {
             });
             const vote: any = voteData[0]?.toJSON();
             if (Math.abs(vote.state + voteToAdd) > 1) {
-                const postData = await PostModel.findOne({where: {id}});
-                response.json(postData);
+                await LikeModel.update({state: 0}, {where: {postId: id, userId: user_id}});
+                const postData = await PostModel.increment({votes: -voteToAdd}, {where: {id}});
+                // @ts-ignore
+                const post = postData[0][0][0];
+                response.json({...post});
             } else {
+                console.log(vote.state, voteToAdd);
                 await LikeModel.update({state: voteToAdd}, {where: {postId: id, userId: user_id}});
+                if (vote.state + voteToAdd === 0) {
+                    voteToAdd *= 2;
+                }
                 const postData = await PostModel.increment({votes: voteToAdd}, {where: {id}});
                 // @ts-ignore
                 const post = postData[0][0][0];
