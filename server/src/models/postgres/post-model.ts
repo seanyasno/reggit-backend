@@ -9,7 +9,7 @@ const PostModel = database.define('post', {
         primaryKey: true
     },
     userId: {
-        type: INTEGER,
+        type: UUID,
         field: 'user_id',
         allowNull: false
     },
