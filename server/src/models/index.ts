@@ -11,9 +11,12 @@ import IPost from './post';
 
 UserModel.hasOne(ProfileModel);
 UserModel.hasMany(PostModel);
+PostModel.hasMany(CommentModel);
 
 ProfileModel.belongsTo(UserModel);
 PostModel.belongsTo(UserModel);
+CommentModel.belongsTo(UserModel);
+CommentModel.belongsTo(PostModel);
 
 export {
     validateUser,

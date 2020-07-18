@@ -1,5 +1,5 @@
 import {Request, Response} from 'express';
-import {CommentModel} from '../models';
+import {CommentModel, PostModel, ProfileModel, UserModel} from '../models';
 
 export default class CommentController {
     async createComment(request: Request, response: Response) {
@@ -26,7 +26,19 @@ export default class CommentController {
 
         try {
             const comments = await CommentModel.findAll({
-                where: {postId}
+                where: {postId},
+                include: [
+                    {
+                        model: UserModel,
+                        attributes: ['id', 'username'],
+                        include: [
+                            {
+                                model: ProfileModel,
+                                attributes: ['firstName', 'lastName']
+                            }
+                        ]
+                    }
+                ]
             });
             return response.json(comments);
         } catch (error) {
