@@ -1,4 +1,4 @@
-import {IPost, LikeModel, PostModel, ProfileModel, UserModel} from '../models';
+import {CommentModel, IPost, LikeModel, PostModel, ProfileModel, UserModel} from '../models';
 import {Request, Response} from 'express';
 import {v4} from 'uuid';
 
@@ -117,6 +117,9 @@ export default class PostController {
 
         try {
             await LikeModel.destroy({
+                where: {post_id: id}
+            });
+            await CommentModel.destroy({
                 where: {post_id: id}
             });
             const removedPost = await PostModel.destroy({
