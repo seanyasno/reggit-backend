@@ -1,4 +1,4 @@
-import {authentication, posting, commenting} from './routes';
+import {authentication, posting, commenting, forums} from './routes';
 import {database} from './conf/config';
 import express from 'express';
 import helmet from 'helmet';
@@ -21,6 +21,7 @@ app.use(express.json());
 app.use('/api/auth', authentication)
 app.use('/api/post', posting);
 app.use('/api/comment', commenting);
+app.use('/api/forum', forums);
 
 // db connection
 database.authenticate().then(() => {
