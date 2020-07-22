@@ -16,9 +16,9 @@ export default class ForumController {
     }
 
     async getAllForums(request: Request, response: Response) {
-
         try {
-
+            const forums = await ForumModel.findAll();
+            response.json(forums);
         } catch(error) {
             response.status(400).json({
                 errors: {form: error}
@@ -30,7 +30,8 @@ export default class ForumController {
         const {forumId} = request.params;
 
         try {
-
+            const forum = await ForumModel.findOne({where: {id: forumId}});
+            response.json(forum);
         } catch(error) {
             response.status(400).json({
                 errors: {form: error}
