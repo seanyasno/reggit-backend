@@ -14,11 +14,13 @@ import IPost from './post';
 UserModel.hasOne(ProfileModel);
 UserModel.hasMany(PostModel);
 PostModel.hasMany(CommentModel);
+ForumModel.hasMany(PostModel);
 
 ProfileModel.belongsTo(UserModel);
 PostModel.belongsTo(UserModel);
 CommentModel.belongsTo(UserModel);
 CommentModel.belongsTo(PostModel);
+PostModel.belongsTo(ForumModel);
 
 export {
     validateUser,
