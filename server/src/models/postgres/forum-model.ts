@@ -13,6 +13,11 @@ const ForumModel = database.define('forum', {
         type: STRING,
         field: 'name',
         allowNull: false
+    },
+    description: {
+        type: STRING,
+        field: 'description',
+        allowNull: true
     }
 }, {
     timestamps: false

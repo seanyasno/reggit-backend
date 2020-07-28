@@ -18,9 +18,9 @@ app.use(cors({
 app.use(express.json());
 
 // routes
-app.use('/api/auth', authentication)
-app.use('/api/post', posting);
+app.use('/api/auth', authentication);
 app.use('/api/comment', commenting);
+app.use('/api/post', posting);
 app.use('/api/forum', forums);
 
 // db connection
