@@ -2,6 +2,7 @@ import {IUser, ProfileModel, UserModel, validateUser, IUserAuth} from '../models
 import {Request, Response} from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import _ from 'lodash';
 
 export default class LoginController {
     login(request: Request, response: Response) {
@@ -31,9 +32,7 @@ export default class LoginController {
         }).then(async (userData) => {
             const user: IUser = userData?.toJSON() as IUser;
             const validPass = await bcrypt.compare(password, user.password);
-
             delete user.password;
-            console.log(user);
 
             if (validPass) {
                 const token = jwt.sign({...user}, process.env.JWT_SECRET || '');
@@ -45,7 +44,7 @@ export default class LoginController {
             });
         }).catch(error => {
             return response.status(401).json({
-                errors: {form: error}
+                errors: {form: _.isEmpty(error) ? 'Invalid Credentials' : error}
             });
         });
     }
