@@ -1,6 +1,7 @@
 import {CommentModel, IPost, LikeModel, PostModel, ProfileModel, UserModel} from '../models';
 import {Request, Response} from 'express';
 import {v4} from 'uuid';
+import _ from 'lodash';
 
 export default class PostController {
     constructor() {
@@ -9,6 +10,9 @@ export default class PostController {
 
     async createPost(request: Request, response: Response) {
         const {id = v4(), userId, content, votes = 0, forumId}: IPost = request.body;
+        if (_.isEmpty(content)) {
+            return response.status(400).json({errors: {form: "Can't create a post with empty body"}})
+        }
 
         try {
             const savedPostData = await PostModel.create({
