@@ -1,4 +1,4 @@
-import {authentication, posting, commenting} from './routes';
+import {authentication, posting, commenting, forums, subscription} from './routes';
 import {database} from './conf/config';
 import express from 'express';
 import helmet from 'helmet';
@@ -18,9 +18,11 @@ app.use(cors({
 app.use(express.json());
 
 // routes
-app.use('/api/auth', authentication)
-app.use('/api/post', posting);
+app.use('/api/auth', authentication);
 app.use('/api/comment', commenting);
+app.use('/api/post', posting);
+app.use('/api/forum', forums);
+app.use('/api/sub', subscription);
 
 // db connection
 database.authenticate().then(() => {
@@ -34,3 +36,5 @@ database.authenticate().then(() => {
 app.listen(process.env.PORT || 8080, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
 });
+
+export default app;

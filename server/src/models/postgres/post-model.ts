@@ -1,4 +1,4 @@
-import {INTEGER, TEXT, UUID} from 'sequelize';
+import {INTEGER, TEXT, UUID, UUIDV4} from 'sequelize';
 import {database} from '../../conf/config';
 
 const PostModel = database.define('post', {
@@ -6,7 +6,8 @@ const PostModel = database.define('post', {
         type: UUID,
         field: 'id',
         allowNull: false,
-        primaryKey: true
+        primaryKey: true,
+        defaultValue: UUIDV4
     },
     userId: {
         type: UUID,
@@ -22,6 +23,12 @@ const PostModel = database.define('post', {
         type: INTEGER,
         field: 'votes',
         allowNull: false
+    },
+    forumId: {
+        type: UUID,
+        field: 'forum_id',
+        allowNull: false,
+        defaultValue: UUIDV4
     }
 }, {
     timestamps: false,

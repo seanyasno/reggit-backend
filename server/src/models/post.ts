@@ -3,4 +3,5 @@ export default interface IPost {
     userId: string;
     content: string;
     votes: number;
+    forumId: string;
 }

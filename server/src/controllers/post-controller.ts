@@ -8,14 +8,15 @@ export default class PostController {
     }
 
     async createPost(request: Request, response: Response) {
-        const {id = v4(), userId, content, votes = 0}: IPost = request.body;
+        const {id = v4(), userId, content, votes = 0, forumId}: IPost = request.body;
 
         try {
             const savedPostData = await PostModel.create({
                 id,
                 userId,
                 content,
-                votes
+                votes,
+                forumId
             });
             const userData = await UserModel.findOne({
                 where: {id: userId},
@@ -30,7 +31,7 @@ export default class PostController {
             let savedPost = savedPostData.toJSON();
             // @ts-ignore
             savedPost['user'] = userData?.toJSON();
-            return await response.json(savedPost);
+            return response.json(savedPost);
         } catch (error) {
             return response.status(400).json({message: error.toString()});
         }
