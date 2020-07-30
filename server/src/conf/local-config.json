@@ -1,0 +1,13 @@
+{
+  "PORT": 1337,
+  "SERVER_URL": "http://localhost",
+  "ROUTES": {
+    "AUTHENTICATION": {
+      "BASE": "/api/auth",
+      "LOGIN": "/login",
+      "REGISTER": "/register",
+      "GET_ALL_USERS": "/users",
+      "GET_PROFILE_BY_ID": "/profile/:id"
+    }
+  }
+}

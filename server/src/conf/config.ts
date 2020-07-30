@@ -1,4 +1,30 @@
 import {Sequelize} from 'sequelize';
+import localConfig from './local-config.json';
+
+export default class Config {
+    private static config: Config;
+    private loadLocalConfiguration: boolean = true;
+
+    public static getInstance() {
+        if (!this.config) {
+            this.config = new Config();
+        }
+
+        return this.config;
+    }
+
+    public getConfiguration() {
+        if (this.loadLocalConfiguration) {
+            return localConfig;
+        }
+
+        return localConfig;
+    }
+
+    public getServerUrl(): string {
+        return Config.getInstance().getConfiguration().SERVER_URL + ':' + Config.getInstance().getConfiguration().PORT;
+    }
+}
 
 const database = new Sequelize('reggit-local', 'postgres', 'bsgyns0w', {
     host: 'localhost',
@@ -12,5 +38,6 @@ const database = new Sequelize('reggit-local', 'postgres', 'bsgyns0w', {
 });
 
 export {
-    database
+    database,
+    Config
 };
