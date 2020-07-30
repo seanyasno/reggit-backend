@@ -8,6 +8,13 @@
       "REGISTER": "/register",
       "GET_ALL_USERS": "/users",
       "GET_PROFILE_BY_ID": "/profile/:id"
+    },
+    "FORUMS": {
+      "BASE": "/api/forum",
+      "GET_ALL_FORUMS": "/getAllForums",
+      "GET_FORUM_BY_ID": "/getForumById/",
+      "GET_ALL_POSTS_BY_FORUM_ID": "/getPostsOf/",
+      "CREATE": "createForum"
     }
   }
 }
