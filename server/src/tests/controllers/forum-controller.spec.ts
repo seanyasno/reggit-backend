@@ -19,6 +19,7 @@ describe('forum controller', () => {
             .end((error, response) => {
                 response.should.have.status(200);
                 response.body.should.be.an('array');
+                console.log(response.body);
                 done();
             });
     });
@@ -30,6 +31,7 @@ describe('forum controller', () => {
                 response.should.have.status(200);
                 response.body.should.be.a('object');
                 response.body.should.have.keys('id', 'name', 'description');
+                console.log(response.body);
                 done();
             });
     });
@@ -41,6 +43,24 @@ describe('forum controller', () => {
                 response.should.have.status(200);
                 response.body.should.have.be.an('array');
                 console.log(response.body);
+                done();
+            });
+    });
+
+    it('Fail at getting forum with invalid id', done => {
+        chai.request(app)
+            .get(baseUrl + config.GET_FORUM_BY_ID + wrongForumId)
+            .end((error, response) => {
+                response.should.have.status(404);
+                done();
+            });
+    });
+
+    it('Fail at getting posts with invalid forum id', done => {
+        chai.request(app)
+            .get(baseUrl + config.GET_ALL_POSTS_BY_FORUM_ID + wrongForumId)
+            .end((error, response) => {
+                response.should.have.status(400);
                 done();
             });
     });

@@ -1,5 +1,5 @@
-import {Request, Response} from 'express';
 import {ForumModel, PostModel, ProfileModel, UserModel} from '../models';
+import {Request, Response} from 'express';
 
 export default class ForumController {
     async createForum(request: Request, response: Response) {
@@ -33,7 +33,7 @@ export default class ForumController {
             const forum = await ForumModel.findOne({where: {id: forumId}});
             response.json(forum);
         } catch (error) {
-            response.status(400).json({
+            response.status(404).json({
                 errors: {form: error}
             });
         }
