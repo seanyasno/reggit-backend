@@ -27,11 +27,14 @@ const createPost = (userId: string, forumId: string, content: string): request.S
         .send({userId, forumId, content});
 }
 
-const failedTest = (response: any, messageError: string) => {
-    console.log(response.body);
-    response.should.have.status(400);
-    response.body.should.have.be.an('object');
-    chai.expect(response.body.errors.form).to.be.equals(messageError);
+const failedPostTest = (done: Mocha.Done, messageError: string, userId: string, forumId: string, content: string) => {
+    createPost(userId, forumId, content).end((error: any, response: any) => {
+        console.log(response.body);
+        response.should.have.status(400);
+        response.body.should.have.be.an('object');
+        chai.expect(response.body.errors.form).to.be.equals(messageError);
+        done();
+    });
 }
 
 describe('post controller', () => {
@@ -69,52 +72,17 @@ describe('post controller', () => {
             });
     });
 
-    it('Try create post with empty content', done => {
-        createPost(userId, forumId, '').end((error: any, response: any) => {
-            failedTest(response, "Can't create a post with empty body");
-            done();
-        });
-    });
+    it('Try create post with empty content', done => failedPostTest(done, "Can't create a post with empty body", userId, forumId, ''));
 
-    it('Try create post with empty user id', done => {
-        createPost('', forumId, 'This is a test post with user id.').end((error: any, response: any) => {
-            failedTest(response, "Can't create a post with empty user id");
-            done();
-        })
-    });
+    it('Try create post with empty user id', done => failedPostTest(done, "Can't create a post with empty user id", '', forumId, 'This is a test post with user id.'));
 
-    it('Try create post with empty forum id', done => {
-        createPost(userId, '', 'This is a test post with forum id.').end((error: any, response: any) => {
-            failedTest(response, "Can't create a post with empty forum id");
-            done();
-        })
-    });
+    it('Try create post with empty forum id', done => failedPostTest(done, "Can't create a post with empty forum id", userId, '', 'This is a test post with forum id.'));
 
-    it('Try create post with invalid user id', done => {
-        createPost(invalidUserId, forumId, 'This is a test post with invalid user id.').end((error: any, response: any) => {
-            failedTest(response, 'SequelizeDatabaseError: invalid input syntax for type uuid: "invalid"');
-            done();
-        });
-    });
+    it('Try create post with invalid user id', done => failedPostTest(done, 'SequelizeDatabaseError: invalid input syntax for type uuid: "invalid"', invalidUserId, forumId, 'This is a test post with invalid user id.'));
 
-    it('Try create post with invalid forum id', done => {
-        createPost(userId, invalidForumId, 'This is a test post with invalid forum id.').end((error: any, response: any) => {
-            failedTest(response, 'SequelizeDatabaseError: invalid input syntax for type uuid: "invalid"');
-            done();
-        });
-    });
+    it('Try create post with invalid forum id', done => failedPostTest(done, 'SequelizeDatabaseError: invalid input syntax for type uuid: "invalid"', userId, invalidForumId, 'This is a test post with invalid forum id.'));
 
-    it('Try create post with not existed user id', done => {
-        createPost(notExistedUserId, forumId, 'This is a test post with not existed user id.').end((error: any, response: any) => {
-            failedTest(response, `There is no user with id of ${notExistedUserId}`);
-            done();
-        });
-    });
+    it('Try create post with not existed user id', done => failedPostTest(done, `There is no user with id of ${notExistedUserId}`, notExistedUserId, forumId, 'This is a test post with not existed user id.'));
 
-    it('Try create post with not existed forum id', done => {
-        createPost(userId, notExistedForumId, 'This is a test post with not existed forum id.').end((error: any, response: any) => {
-            failedTest(response, `There is no forum with id of ${notExistedForumId}`);
-            done();
-        });
-    });
+    it('Try create post with not existed forum id', done => failedPostTest(done, `There is no forum with id of ${notExistedForumId}`, userId, notExistedForumId, 'This is a test post with not existed forum id.'));
 });
