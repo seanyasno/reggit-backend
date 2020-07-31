@@ -10,18 +10,15 @@ export default class PostController {
 
     async createPost(request: Request, response: Response) {
         const {id = v4(), userId, content, votes = 0, forumId}: IPost = request.body;
-        if (_.isEmpty(content)) {
-            return response.status(400).json({errors: {form: "Can't create a post with empty body"}})
+        if (_.isEmpty(userId)) {
+            return response.status(400).json({errors: {form: "Can't create a post with empty user id"}});
+        } else if (_.isEmpty(content)) {
+            return response.status(400).json({errors: {form: "Can't create a post with empty body"}});
+        } else if (_.isEmpty(forumId)) {
+            return response.status(400).json({errors: {form: "Can't create a post with empty forum id"}});
         }
 
         try {
-            const savedPostData = await PostModel.create({
-                id,
-                userId,
-                content,
-                votes,
-                forumId
-            });
             const userData = await UserModel.findOne({
                 where: {id: userId},
                 attributes: ['id', 'username'],
@@ -32,12 +29,23 @@ export default class PostController {
                     }
                 ]
             });
+            if (!userData) {
+                throw (`There is no user with id of ${userId}`);
+            }
+
+            const savedPostData = await PostModel.create({
+                id,
+                userId,
+                content,
+                votes,
+                forumId
+            });
             let savedPost = savedPostData.toJSON();
             // @ts-ignore
             savedPost['user'] = userData?.toJSON();
             return response.json(savedPost);
         } catch (error) {
-            return response.status(400).json({message: error.toString()});
+            return response.status(400).json({errors: {form: error.toString()}});
         }
     }
 
@@ -62,7 +70,7 @@ export default class PostController {
             return response.json(post);
         } catch (error) {
             return response.status(404).json({
-                error: {form: 'Invalid post id'}
+                errors: {form: 'Invalid post id'}
             });
         }
     }
@@ -81,7 +89,7 @@ export default class PostController {
             return response.json(posts);
         } catch (error) {
             return response.status(400).json({
-                error: {form: error.toString()}
+                errors: {form: error.toString()}
             });
         }
     }
