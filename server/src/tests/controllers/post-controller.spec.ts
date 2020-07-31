@@ -1,5 +1,5 @@
 import Config from '../../conf/config';
-import chaiHttp from "chai-http";
+import chaiHttp from 'chai-http';
 import {request} from 'express';
 import app from '../../app';
 import chai from 'chai';
@@ -97,9 +97,23 @@ describe('post controller', () => {
         });
     });
 
+    it('Try create post with invalid forum id', done => {
+        createPost(userId, invalidForumId, 'This is a test post with invalid forum id.').end((error: any, response: any) => {
+            failedTest(response, 'SequelizeDatabaseError: invalid input syntax for type uuid: "invalid"');
+            done();
+        });
+    });
+
     it('Try create post with not existed user id', done => {
-        createPost(notExistedUserId, forumId, 'This is a test post with invalid user id.').end((error: any, response: any) => {
+        createPost(notExistedUserId, forumId, 'This is a test post with not existed user id.').end((error: any, response: any) => {
             failedTest(response, `There is no user with id of ${notExistedUserId}`);
+            done();
+        });
+    });
+
+    it('Try create post with not existed forum id', done => {
+        createPost(userId, notExistedForumId, 'This is a test post with not existed forum id.').end((error: any, response: any) => {
+            failedTest(response, `There is no forum with id of ${notExistedForumId}`);
             done();
         });
     });
