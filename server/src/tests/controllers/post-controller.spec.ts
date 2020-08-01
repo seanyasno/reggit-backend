@@ -7,7 +7,6 @@ import chai from 'chai';
 
 chai.use(chaiHttp);
 chai.should();
-
 const config = Config.getInstance().getConfiguration().ROUTES.POSTING;
 
 const userId: string = '39b14a61-73a3-4983-9ae2-7f4bbe633694';
@@ -15,6 +14,7 @@ const forumId: string = '58062e83-5052-4b8d-a174-317f8ffe6dc1';
 let postId: string = '';
 
 const invalidUserId: string = 'invalid';
+const invalidPostId: string = 'invalid';
 const invalidForumId: string = 'invalid';
 
 const notExistedUserId: string = '39b14a61-73a3-4983-9ae2-7f4bbe633699';
@@ -35,7 +35,7 @@ const failedPostTest = async (messageError: string, userId: string, forumId: str
     chai.expect(response.body.errors.form).to.be.equals(messageError);
 }
 
-const votePost = async (userId: string, postId: string, voteState: boolean) => {
+const votePost = async (userId: string, postId: string, voteState: string) => {
     let url = config.BASE + replaceJsonVariable(config.VOTE, 'postId', postId);
     url = replaceJsonVariable(url, 'voteState', voteState.toString());
     return chai.request(app)
@@ -43,8 +43,16 @@ const votePost = async (userId: string, postId: string, voteState: boolean) => {
         .set('user_id', userId);
 }
 
-const successVoteTest = async (userId: string, postId: string, voteState: boolean, votesAmount: number) => {
+const failedVoteTest = async (messageError: string, userId: string, postId: string, voteState: string) => {
     const response = await votePost(userId, postId, voteState);
+    console.log(response.body);
+    response.should.have.status(400);
+    response.body.should.have.be.an('object');
+    response.body.errors.form.should.be.equals(messageError);
+}
+
+const successVoteTest = async (userId: string, postId: string, voteState: boolean, votesAmount: number) => {
+    const response = await votePost(userId, postId, voteState.toString());
     console.log(response.body);
     response.should.have.status(200);
     response.body.should.have.be.an('object');
@@ -107,6 +115,36 @@ describe('Post controller', () => {
             await successVoteTest(userId, postId, true, 1);
             await successVoteTest(userId, postId, false, -1);
             await successVoteTest(userId, postId, true, 1);
+        });
+
+        describe('Empty values', () => {
+            it('Vote with empty user id', async () => {
+                await failedVoteTest('User id is missing.', '', postId, 'true');
+            });
+
+            it('Vote with empty vote state', async () => {
+                const response = await votePost(userId, postId, '');
+                response.should.have.status(404);
+            });
+
+            it('Vote with empty post id', async () => {
+                const response = await votePost(userId, '', 'true');
+                response.should.have.status(404);
+            });
+        });
+
+        describe('Invalid values', () => {
+           it('Vote with invalid user id', async () => {
+               await failedVoteTest('SequelizeDatabaseError: invalid input syntax for type uuid: "invalid"', invalidUserId, postId, 'true');
+           });
+
+           it('Vote with invalid post id', async () => {
+               await failedVoteTest('SequelizeDatabaseError: invalid input syntax for type uuid: "invalid"', userId, invalidPostId, 'true');
+           });
+
+           it('Vote with invalid vote state', async () => {
+               await failedVoteTest('Vote state is at bad format.', userId, postId, 'invalid');
+           });
         });
     });
 

@@ -93,8 +93,13 @@ export default class PostController {
     }
 
     async votePost(request: Request, response: Response) {
-        const {id, voteState} = request.params;
+        const {id = '', voteState} = request.params;
         const {user_id = ''} = request.headers;
+
+        if (_.isEmpty(user_id)) return ErrorHandler.handle(response, 'User id is missing.');
+        if (_.isEmpty(id)) return ErrorHandler.handle(response, 'Post id is missing.');
+        if (voteState !== 'true' && voteState !== 'false') return ErrorHandler.handle(response, 'Vote state is at bad format.');
+
         const voteToAdd = voteState === 'true' ? 1 : -1;
 
         try {
