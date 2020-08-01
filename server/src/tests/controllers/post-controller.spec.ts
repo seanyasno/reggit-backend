@@ -37,7 +37,7 @@ const failedPostTest = (done: Mocha.Done, messageError: string, userId: string, 
     });
 }
 
-describe('post controller', () => {
+describe('Post controller', () => {
     it('Get all posts', done => {
         chai.request(app)
             .get(config.BASE + config.GET_ALL_POSTS)
