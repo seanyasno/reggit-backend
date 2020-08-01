@@ -12,7 +12,7 @@ const baseUrl = config.BASE;
 const forumId = '58062e83-5052-4b8d-a174-317f8ffe6dc1';
 const wrongForumId = 'wrong';
 
-describe('forum controller', () => {
+describe('Forum controller', () => {
     it('Get all forums', done => {
         chai.request(app)
             .get(baseUrl + config.GET_ALL_FORUMS)
