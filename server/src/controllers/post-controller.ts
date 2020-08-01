@@ -102,13 +102,13 @@ export default class PostController {
                 where: {postId: id, userId: user_id}
             });
             const vote: any = voteData[0]?.toJSON();
+            let post;
             if (Math.abs(vote.state + voteToAdd) > 1) {
-                const post = await PostController.updateVotes(0, -voteToAdd, id, user_id);
-                return response.json({...post});
+                post = await PostController.updateVotes(0, -voteToAdd, id, user_id);
             } else {
-                const post = await PostController.updateVotes(voteToAdd, vote.state + voteToAdd === 0 ? voteToAdd * 2 : voteToAdd, id, user_id);
-                return response.json({...post});
+                post = await PostController.updateVotes(voteToAdd, vote.state + voteToAdd === 0 ? voteToAdd * 2 : voteToAdd, id, user_id);
             }
+            return response.json(post);
         } catch (error) {
             return ErrorHandler.handle(response, error.toString());
         }
@@ -118,7 +118,11 @@ export default class PostController {
         await LikeModel.update({state: voteState}, {where: {postId: postId, userId: userId}});
         const postData = await PostModel.increment({votes: voteToAdd}, {where: {id: postId}});
         // @ts-ignore
-        return postData[0][0][0];
+        let post = postData[0][0][0];
+        post = {...post, userId: post.user_id, forumId: post.forum_id};
+        delete post.user_id;
+        delete post.forum_id;
+        return post;
     }
 
     async deletePost(request: Request, response: Response) {

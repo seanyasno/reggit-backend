@@ -21,7 +21,9 @@
       "CREATE": "/new",
       "GET_POST_BY_ID": "/",
       "GET_ALL_POSTS": "",
-      "DELETE_POST": "/delete/"
+      "DELETE_POST": "/delete/",
+      "VOTE": "/{postId}/{voteState}",
+      "VOTE_STATE": "/"
     }
   }
 }
