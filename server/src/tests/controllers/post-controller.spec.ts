@@ -156,5 +156,11 @@ describe('Post controller', () => {
             response.body.should.have.be.a('number');
             chai.expect(response.body).to.be.equals(1);
         });
+
+        it('Remove post with empty post id', async () => {
+            const response = await chai.request(app).delete(config.BASE + config.DELETE_POST);
+            console.log(response.body);
+            response.should.have.status(404);
+        });
     });
 });
