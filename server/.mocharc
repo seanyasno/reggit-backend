@@ -1,4 +1,4 @@
 {
-  "require": "@babel/register",
+  "require": "ts-node/register",
   "spec": "dist/tests/**/*.spec.js"
 }

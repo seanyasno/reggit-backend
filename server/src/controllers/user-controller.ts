@@ -1,6 +1,7 @@
 import UserModel from '../models/postgres/user-model';
 import {Request, Response} from 'express';
 import {ProfileModel} from '../models';
+import {ErrorHandler} from '../utils';
 
 export default class UserController {
     async getAllUsers(request: Request, response: Response) {
@@ -10,7 +11,7 @@ export default class UserController {
             });
             return response.json({users});
         } catch (error) {
-            return response.json({errors: error});
+            ErrorHandler.handle(response, error.toString());
         }
     }
 
@@ -19,7 +20,7 @@ export default class UserController {
             const profile = await ProfileModel.findOne({where: {userId: request.params.id}});
             return response.json(profile);
         } catch (error) {
-            return response.json({errors: error});
+            ErrorHandler.handle(response, error.toString());
         }
     }
 }

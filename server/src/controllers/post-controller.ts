@@ -1,6 +1,8 @@
-import {CommentModel, IPost, LikeModel, PostModel, ProfileModel, UserModel} from '../models';
+import {CommentModel, ForumModel, IPost, LikeModel, PostModel, ProfileModel, UserModel} from '../models';
 import {Request, Response} from 'express';
+import {ErrorHandler} from '../utils';
 import {v4} from 'uuid';
+import _ from 'lodash';
 
 export default class PostController {
     constructor() {
@@ -9,15 +11,15 @@ export default class PostController {
 
     async createPost(request: Request, response: Response) {
         const {id = v4(), userId, content, votes = 0, forumId}: IPost = request.body;
+        if (_.isEmpty(userId)) {
+            return ErrorHandler.handle(response, "Can't create a post with empty user id");
+        } else if (_.isEmpty(content)) {
+            return ErrorHandler.handle(response, "Can't create a post with empty body");
+        } else if (_.isEmpty(forumId)) {
+            return ErrorHandler.handle(response, "Can't create a post with empty forum id");
+        }
 
         try {
-            const savedPostData = await PostModel.create({
-                id,
-                userId,
-                content,
-                votes,
-                forumId
-            });
             const userData = await UserModel.findOne({
                 where: {id: userId},
                 attributes: ['id', 'username'],
@@ -28,12 +30,24 @@ export default class PostController {
                     }
                 ]
             });
+            if (!userData) return ErrorHandler.handle(response, `There is no user with id of ${userId}`);
+
+            const forum = await ForumModel.findOne({where: {id: forumId}});
+            if (!forum) return ErrorHandler.handle(response, `There is no forum with id of ${forumId}`);
+
+            const savedPostData = await PostModel.create({
+                id,
+                userId,
+                content,
+                votes,
+                forumId
+            });
             let savedPost = savedPostData.toJSON();
             // @ts-ignore
             savedPost['user'] = userData?.toJSON();
             return response.json(savedPost);
         } catch (error) {
-            return response.status(400).json({message: error.toString()});
+            return ErrorHandler.handle(response, error.toString());
         }
     }
 
@@ -57,9 +71,7 @@ export default class PostController {
             let post: IPost = await postData?.toJSON() as IPost;
             return response.json(post);
         } catch (error) {
-            return response.status(404).json({
-                error: {form: 'Invalid post id'}
-            });
+            return ErrorHandler.handle(response, error.toString());
         }
     }
 
@@ -76,15 +88,18 @@ export default class PostController {
             });
             return response.json(posts);
         } catch (error) {
-            return response.status(400).json({
-                error: {form: error.toString()}
-            });
+            return ErrorHandler.handle(response, error.toString());
         }
     }
 
     async votePost(request: Request, response: Response) {
-        const {id, voteState} = request.params;
-        const {user_id=''} = request.headers;
+        const {id = '', voteState} = request.params;
+        const {user_id = ''} = request.headers;
+
+        if (_.isEmpty(user_id)) return ErrorHandler.handle(response, 'User id is missing.');
+        if (_.isEmpty(id)) return ErrorHandler.handle(response, 'Post id is missing.');
+        if (voteState !== 'true' && voteState !== 'false') return ErrorHandler.handle(response, 'Vote state is at bad format.');
+
         const voteToAdd = voteState === 'true' ? 1 : -1;
 
         try {
@@ -92,17 +107,15 @@ export default class PostController {
                 where: {postId: id, userId: user_id}
             });
             const vote: any = voteData[0]?.toJSON();
+            let post;
             if (Math.abs(vote.state + voteToAdd) > 1) {
-                const post = await PostController.updateVotes(0, -voteToAdd, id, user_id);
-                response.json({...post});
+                post = await PostController.updateVotes(0, -voteToAdd, id, user_id);
             } else {
-                const post = await PostController.updateVotes(voteToAdd, vote.state + voteToAdd === 0 ? voteToAdd * 2 : voteToAdd, id, user_id);
-                return response.json({...post});
+                post = await PostController.updateVotes(voteToAdd, vote.state + voteToAdd === 0 ? voteToAdd * 2 : voteToAdd, id, user_id);
             }
+            return response.json(post);
         } catch (error) {
-            return response.status(400).json({
-                errors: {form: error.toString()}
-            });
+            return ErrorHandler.handle(response, error.toString());
         }
     }
 
@@ -110,7 +123,11 @@ export default class PostController {
         await LikeModel.update({state: voteState}, {where: {postId: postId, userId: userId}});
         const postData = await PostModel.increment({votes: voteToAdd}, {where: {id: postId}});
         // @ts-ignore
-        return postData[0][0][0];
+        let post = postData[0][0][0];
+        post = {...post, userId: post.user_id, forumId: post.forum_id};
+        delete post.user_id;
+        delete post.forum_id;
+        return post;
     }
 
     async deletePost(request: Request, response: Response) {
@@ -126,11 +143,9 @@ export default class PostController {
             const removedPost = await PostModel.destroy({
                 where: {id}
             });
-            response.json(removedPost);
+            return response.json(removedPost);
         } catch (error) {
-            response.status(400).json({
-                errors: {form: error.toString()}
-            });
+            return ErrorHandler.handle(response, error.toString());
         }
     }
 
@@ -144,9 +159,7 @@ export default class PostController {
             });
             response.json(likeModel);
         } catch (error) {
-            response.status(400).json({
-                errors: {form: error.toString()}
-            });
+            return ErrorHandler.handle(response, error.toString());
         }
     }
 }
