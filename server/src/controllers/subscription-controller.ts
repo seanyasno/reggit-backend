@@ -18,6 +18,21 @@ export default class SubscriptionController {
         }
     }
 
+    async removeSubscribe(request: Request, response: Response) {
+        const {forumId, userId}: ISubscriber = request.body;
+
+        try {
+            const subscriber = await SubscriberModel.destroy({
+               where: {userId, forumId}
+            });
+            response.json(subscriber);
+        } catch (error) {
+            response.status(400).json({
+                errors: {form: error.toString()}
+            });
+        }
+    }
+
     async getForumsByUserId(request: Request, response: Response) {
         const {userId} = request.query;
 

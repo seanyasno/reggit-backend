@@ -24,6 +24,13 @@
       "DELETE_POST": "/delete/",
       "VOTE": "/{postId}/{voteState}",
       "VOTE_STATE": "/"
+    },
+    "SUBSCRIPTION": {
+      "BASE": "/api/sub",
+      "CREATE": "/new",
+      "REMOVE": "/remove",
+      "GET_ALL_FORUMS_BY_USER_ID": "/getForums",
+      "GET_ALL_USERS_BY_FORUM_ID": "/getUsers"
     }
   }
 }
