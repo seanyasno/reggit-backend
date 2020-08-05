@@ -1,6 +1,7 @@
 import ISubscriber from '../models/subscriber';
 import {Request, Response} from 'express';
 import {SubscriberModel} from '../models';
+import {ErrorHandler} from '../utils';
 
 export default class SubscriptionController {
     async createSubscriber(request: Request, response: Response) {
@@ -12,9 +13,20 @@ export default class SubscriptionController {
             });
             response.json(subscriber);
         } catch (error) {
-            response.status(400).json({
-                errors: {form: error.toString()}
+            ErrorHandler.handle(response, error.toString());
+        }
+    }
+
+    async removeSubscribe(request: Request, response: Response) {
+        const {forumId, userId}: ISubscriber = request.body;
+
+        try {
+            const subscriber = await SubscriberModel.destroy({
+               where: {userId, forumId}
             });
+            return response.json(subscriber);
+        } catch (error) {
+            return ErrorHandler.handle(response, error.toString());
         }
     }
 
@@ -32,11 +44,9 @@ export default class SubscriptionController {
                 where: {userId}
             });
             const forumIds: Array<string> = subscribers.map(sub => sub.forumId);
-            response.json(forumIds);
+            return response.json(forumIds);
         } catch (error) {
-            response.status(400).json({
-                errors: {form: error.toString()}
-            });
+            return ErrorHandler.handle(response, error.toString());
         }
     }
 
@@ -45,20 +55,16 @@ export default class SubscriptionController {
 
         try {
             if (!forumId) {
-                response.status(400).json({
-                    errors: {form: 'forum id is missing.'}
-                });
+                return ErrorHandler.handle(response, 'forum id is missing.');
             }
 
             const subscribers: Array<ISubscriber> = await SubscriberModel.findAll({
                 where: {forumId}
             });
             const userIds: Array<string> = subscribers.map(sub => sub.userId);
-            response.json(userIds);
+            return response.json(userIds);
         } catch (error) {
-            response.status(400).json({
-                errors: {form: error.toString()}
-            });
+            return ErrorHandler.handle(response, error.toString());
         }
     }
 }
